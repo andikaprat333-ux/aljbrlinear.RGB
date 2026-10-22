@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RGB Matrix Studio</title>
+  <style>
+    :root {
+      --ink: #14213d;
+      --muted: #5b6678;
+      --line: #d9dfe8;
+      --bg: #f5f7fa;
+      --card: #fff;
+      --accent: #0f766e;
+      --hdr: #14213d;
+      --hdrfg: #fff;
+      --hdrsub: #c7d2e6;
+      --field: #fff;
+      --bd: #c4cdda;
+      --soft: #e8edf3;
+      --head: #f0f3f7;
+      --formula: #eef6f5;
+      --chip: #e8f1f0;
+      --chipfg: #0b4f4a;
+      --pre: #fbfcfd;
+      --grid: #e3e8ef;
+      --ck1: #eef1f5;
+      --ck2: #fff;
+      --tabon: #14213d;
+      --tabonfg: #fff;
+      color-scheme: light;
+      --r: #c2362f;
+      --g: #2f8f46;
+      --b: #2d5fd0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background: var(--bg)
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      line-height: 1.5
+    }
+
+    header {
+      background: var(--hdr);
+      color: var(--hdrfg);
+      padding: 22px clamp(16px, 4vw, 42px);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: center
+    }
+
+    header h1 {
+      margin: 0 0 4px;
+      font-size: clamp(1.3rem, 3vw, 1.9rem)
+    }
+
+    header p {
+      margin: 0;
+      color: var(--hdrsub)
+    }
+
+    .theme {
+      min-width: 170px
+    }
+
+    .theme label {
+      color: var(--hdrsub);
+      margin-bottom: 4px
+    }
+
+    main {
+      max-width: 1400px;
+      margin: auto;
+      padding: 18px
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 16px
+    }
+
+    .panel>h2 {
+      margin: 0 0 4px;
+      font-size: 1.15rem
+    }
+
+    .panel>.sub {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: .92rem
+    }
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 1rem
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      align-items: end
+    }
+
+    .two {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: .9rem;
+      margin-bottom: 6px
+    }
+
+    input[type=file],
+    select,
+    input[type=number],
+    button {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid var(--bd);
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: var(--field);
+      color: inherit;
+      font: inherit
+    }
+
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--accent)
+    }
+
+    button {
+      border: 0;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer
+    }
+
+    button:hover:not(:disabled) {
+      filter: brightness(1.1)
+    }
+
+    button:disabled {
+      opacity: .4;
+      cursor: not-allowed
+    }
+
+    button.ghost {
+      background: var(--soft);
+      color: var(--ink)
+    }
+
+    :focus-visible {
+      outline: 3px solid #f0b429;
+      outline-offset: 2px
+    }
+
+    .val {
+      color: var(--muted);
+      font-size: .85rem
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: .9rem
+    }
+
+    .formula {
+      background: var(--formula);
+      border-left: 4px solid var(--accent);
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-family: Consolas, monospace;
+      font-size: .9rem;
+      margin-top: 12px
+    }
+
+    .hidden {
+      display: none !important
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      max-height: 380px;
+      object-fit: contain;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: repeating-conic-gradient(var(--ck1) 0% 25%, var(--ck2) 0% 50%) 50%/18px 18px
+    }
+
+    canvas.hist {
+      background: var(--field);
+      max-height: 150px
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px
+    }
+
+    .chip {
+      background: var(--chip);
+      color: var(--chipfg);
+      border-radius: 999px;
+      padding: 5px 11px;
+      font-size: .85rem
+    }
+
+    table.stat {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: .92rem
+    }
+
+    table.stat th,
+    table.stat td {
+      border-bottom: 1px solid var(--line);
+      padding: 7px 8px;
+      text-align: right
+    }
+
+    table.stat th:first-child,
+    table.stat td:first-child {
+      text-align: left
+    }
+
+    table.stat th {
+      background: var(--head)
+    }
+
+    .sw {
+      display: inline-block;
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      border: 1px solid #0003;
+      vertical-align: middle;
+      margin-right: 6px
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px
+    }
+
+    .tabs button {
+      width: auto;
+      background: var(--soft);
+      color: var(--ink);
+      padding: 7px 14px
+    }
+
+    .tabs button.on {
+      background: var(--tabon);
+      color: var(--tabonfg)
+    }
+
+    .bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 12px
+    }
+
+    .bar>div {
+      min-width: 170px
+    }
+
+    .wrap {
+      overflow: auto;
+      max-height: 460px;
+      border: 1px solid var(--line);
+      border-radius: 8px
+    }
+
+    table.mat {
+      border-collapse: collapse;
+      font-family: Consolas, monospace;
+      font-size: 12px;
+      white-space: nowrap
+    }
+
+    table.mat th,
+    table.mat td {
+      border: 1px solid var(--grid);
+      padding: 5px 7px;
+      text-align: right
+    }
+
+    table.mat th {
+      background: var(--head);
+      position: sticky;
+      top: 0;
+      z-index: 1
+    }
+
+    table.mat td {
+      cursor: pointer
+    }
+
+    table.mat td.sel {
+      outline: 3px solid #f0b429;
+      outline-offset: -3px
+    }
+
+    pre.br {
+      margin: 0;
+      padding: 14px;
+      max-height: 460px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--pre);
+      font: 13px/1.45 Consolas, monospace
+    }
+
+    .calc {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px
+    }
+
+    .box {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px
+    }
+
+    .box .big {
+      font: 600 1.2rem Consolas, monospace;
+      margin-top: 6px
+    }
+
+    .steps {
+      font-family: Consolas, monospace;
+      font-size: .88rem;
+      margin: 0;
+      padding-left: 18px
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 10px
+    }
+
+    footer {
+      color: var(--muted);
+      text-align: center;
+      padding: 8px 20px 26px;
+      font-size: .85rem
+    }
+
+    .pal {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px
+    }
+
+    .pal .item {
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 4px 10px 4px 4px;
+      font: 12px Consolas, monospace
+    }
+
+    .pal .item .sw {
+      margin-right: 6px
+    }
+
+    :root[data-theme="dark"] {
+      --ink: #e6ebf5;
+      --muted: #9aa7bd;
+      --line: #2f3a4f;
+      --bg: #0f1624;
+      --card: #182134;
+      --accent: #0d9488;
+      --hdr: #0b1120;
+      --hdrfg: #f1f5fb;
+      --hdrsub: #9aa7bd;
+      --field: #0f1624;
+      --bd: #3a4660;
+      --soft: #243049;
+      --head: #212c43;
+      --formula: #14302e;
+      --chip: #173a38;
+      --chipfg: #a7f3d0;
+      --pre: #131b2c;
+      --grid: #2c374e;
+      --ck1: #1d2740;
+      --ck2: #223050;
+      --tabon: #e6ebf5;
+      --tabonfg: #14213d;
+      color-scheme: dark
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div>
+      <h1>RGB Matrix Studio</h1>
+      <p>Ubah gambar menjadi matriks angka RGB, terapkan filter, lalu lihat perhitungannya langkah demi langkah.</p>
+    </div>
+    <div class="theme">
+      <label for="theme">Tema tampilan</label>
+      <select id="theme">
+        <option value="light">Terang</option>
+        <option value="dark">Gelap</option>
+        <option value="auto">Ikuti sistem</option>
+      </select>
+    </div>
+  </header>
+  <main>
+    <section class="panel" id="dropZone">
+      <h2>1. Pengaturan</h2>
+      <p class="sub">Pilih gambar (atau seret ke area ini), model pengolahan, dan ukuran matriks.</p>
+      <div class="grid">
+        <div><label for="fileInput">Gambar</label><input id="fileInput" type="file" accept="image/*" /></div>
+        <div><label for="model">Model pengolahan</label><select id="model"></select></div>
+        <div><label for="matrixSize">Ukuran sisi terpanjang matriks</label>
+          <select id="matrixSize">
+            <option>5</option>
+            <option>8</option>
+            <option>10</option>
+            <option selected>16</option>
+            <option>20</option>
+            <option>32</option>
+            <option>50</option>
+          </select>
+        </div>
+        <div><label for="mosaic">Tampilan gambar hasil</label>
+          <select id="mosaic">
+            <option value="mat">Hanya warna dari matriks (mosaik)</option>
+            <option value="full">Resolusi penuh</option>
+          </select>
+        </div>
+        <div><label for="palette">Jumlah warna palet</label>
+          <select id="palette">
+            <option value="0">Semua warna matriks</option>
+            <option value="2">2 warna</option>
+            <option value="4">4 warna</option>
+            <option value="8" selected>8 warna</option>
+            <option value="16">16 warna</option>
+            <option value="32">32 warna</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid" style="margin-top:14px">
+        <div id="sCtl"><label for="strength" id="sLabel">Intensitas</label><input id="strength" type="range" />
+          <div class="val" id="sVal"></div>
+        </div>
+        <div id="rCtl" class="hidden"><label for="red">Kanal merah (R)</label><input id="red" type="range" min="0"
+            max="2" step="0.05" value="1" />
+          <div class="val" id="rVal">1.00</div>
+        </div>
+        <div id="gCtl" class="hidden"><label for="green">Kanal hijau (G)</label><input id="green" type="range" min="0"
+            max="2" step="0.05" value="1" />
+          <div class="val" id="gVal">1.00</div>
+        </div>
+        <div id="bCtl" class="hidden"><label for="blue">Kanal biru (B)</label><input id="blue" type="range" min="0"
+            max="2" step="0.05" value="1" />
+          <div class="val" id="bVal">1.00</div>
+        </div>
+        <div><button id="resetBtn" class="ghost">Kembalikan nilai awal</button></div>
+      </div>
+      <div class="formula" id="formula"></div>
+    </section>
+
+    <section class="panel">
+      <h2>2. Gambar dan ringkasan</h2>
+      <p class="sub">Bandingkan gambar asli dengan hasil, lalu baca angka ringkasannya.</p>
+      <div class="two">
+        <div>
+          <h3>Gambar asli</h3><canvas id="origCanvas" width="1" height="1"></canvas>
+        </div>
+        <div>
+          <h3>Hasil pengolahan</h3><canvas id="resCanvas" width="1" height="1"></canvas>
+        </div>
+      </div>
+      <div class="chips"><span class="chip" id="cFile">Belum ada gambar</span><span class="chip" id="cImg">Gambar:
+          -</span><span class="chip" id="cMat">Matriks: -</span><span class="chip" id="cPix">Jumlah piksel matriks:
+          -</span></div>
+      <h3 style="margin-top:16px">Palet warna hasil</h3>
+      <p class="hint">Warna-warna di bawah adalah satu-satunya warna yang tersisa pada matriks dan gambar mosaik.</p>
+      <div id="palBox" class="pal"><span class="hint">Belum ada gambar.</span></div>
+    </section>
+
+    <section class="panel">
+      <h2>3. Statistik dan histogram</h2>
+      <p class="sub">Statistik dihitung dari seluruh piksel gambar. Histogram menunjukkan berapa banyak piksel pada tiap
+        nilai 0–255.</p>
+      <table class="stat">
+        <thead>
+          <tr>
+            <th>Ukuran</th>
+            <th>Asli</th>
+            <th>Hasil</th>
+            <th>Selisih</th>
+          </tr>
+        </thead>
+        <tbody id="statBody">
+          <tr>
+            <td colspan="4">Belum ada data.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="two" style="margin-top:16px">
+        <div>
+          <h3>Histogram asli</h3><canvas id="hOrig" class="hist" width="512" height="150"></canvas>
+        </div>
+        <div>
+          <h3>Histogram hasil</h3><canvas id="hRes" class="hist" width="512" height="150"></canvas>
+        </div>
+      </div>
+      <p class="hint">Warna garis: merah = R, hijau = G, biru = B.</p>
+    </section>
+
+    <section class="panel">
+      <h2>4. Matriks RGB</h2>
+      <p class="sub">Matriks M berukuran baris × kolom. Elemen M[i][j] adalah piksel pada baris i dan kolom j. Klik sel
+        untuk melihat perhitungannya di langkah 5.</p>
+      <div class="bar">
+        <div><label for="matSource">Sumber matriks</label><select id="matSource">
+            <option value="res">Hasil pengolahan</option>
+            <option value="orig">Gambar asli</option>
+          </select></div>
+        <div><label for="matMode">Tampilan</label><select id="matMode">
+            <option value="heat">Tabel berwarna</option>
+            <option value="br">Bentuk matriks (kurung)</option>
+          </select></div>
+      </div>
+      <div class="tabs" id="tabs">
+        <button data-v="rgb" class="on">RGB gabungan</button><button data-v="R">Kanal R</button><button data-v="G">Kanal
+          G</button><button data-v="B">Kanal B</button><button data-v="gray">Grayscale</button>
+      </div>
+      <div class="wrap" id="heatWrap">
+        <table class="mat" id="matTable">
+          <tbody>
+            <tr>
+              <td>Pilih gambar untuk menampilkan matriks.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <pre class="br hidden" id="brBox"></pre>
+    </section>
+
+    <section class="panel">
+      <h2>5. Perhitungan satu piksel</h2>
+      <p class="sub">Pilih piksel dengan mengklik sel matriks atau mengisi baris dan kolom.</p>
+      <div class="bar">
+        <div><label for="selI">Baris (i)</label><input id="selI" type="number" min="0" value="0" /></div>
+        <div><label for="selJ">Kolom (j)</label><input id="selJ" type="number" min="0" value="0" /></div>
+      </div>
+      <div class="calc" id="calc">
+        <p class="hint">Belum ada gambar.</p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>6. Ekspor hasil</h2>
+      <p class="sub">Semua ekspor memakai matriks hasil pengolahan.</p>
+      <div class="actions">
+        <button id="eCsv" disabled>CSV RGB gabungan</button><button id="eChan" disabled>CSV kanal R/G/B</button>
+        <button id="eTxt" disabled>TXT bentuk matriks</button><button id="eJs" disabled>JavaScript (.js)</button>
+        <button id="eJson" disabled>JSON</button><button id="eNpy" disabled>NumPy (.npy)</button>
+        <button id="ePng" disabled>Gambar hasil (PNG)</button><button id="eCopy" class="ghost" disabled>Salin
+          matriks</button>
+      </div>
+    </section>
+  </main>
+  <footer>RGB Matrix Studio. Semua proses berjalan di browser, gambar tidak diunggah.</footer>
+  <script>
+    "use strict";
+    const $ = (id) => document.getElementById(id);
+    const clamp = (v) => Math.max(0, Math.min(255, Math.round(v)));
+    const gray = (r, g, b) => 0.299 * r + 0.587 * g + 0.114 * b;
+    const NAMES = ["R", "G", "B"];
+    const MAX_WORK = 1000;
+
+    // s = [label, min, max, nilai awal, step]; nb = filter ketetanggaan (bukan per piksel)
+    const MODELS = {
+      original: {n: "Gambar Asli", f: "R' = R, G' = G, B' = B"},
+      brightness: {n: "Brightness (Kecerahan)", s: ["Faktor kecerahan k", 0, 2, 1.25, 0.05], f: "R' = R × k  (G dan B sama). k > 1 lebih terang."},
+      contrast: {n: "Contrast (Kontras)", s: ["Faktor kontras k", 0, 3, 1.25, 0.05], f: "R' = (R − 128) × k + 128  (G dan B sama)"},
+      grayscale: {n: "Grayscale (Abu-abu)", f: "Gray = 0.299R + 0.587G + 0.114B, lalu R' = G' = B' = Gray"},
+      sepia: {n: "Sepia", f: "R' = 0.393R + 0.769G + 0.189B;  G' = 0.349R + 0.686G + 0.168B;  B' = 0.272R + 0.534G + 0.131B"},
+      rgb: {n: "Koreksi Warna RGB", f: "R' = R × kR;  G' = G × kG;  B' = B × kB"},
+      saturation: {n: "Saturation (Intensitas warna)", s: ["Faktor saturasi k", 0, 3, 1.25, 0.05], f: "R' = Gray + (R − Gray) × k  (G dan B sama)"},
+      negative: {n: "Negative (Negatif)", f: "R' = 255 − R,  G' = 255 − G,  B' = 255 − B"},
+      threshold: {n: "Threshold (Hitam-Putih)", s: ["Ambang T", 0, 255, 128, 1], f: "Jika Gray ≥ T maka piksel = 255 (putih), selain itu 0 (hitam)"},
+      blur: {n: "Blur (Buram)", s: ["Radius", 0, 10, 2, 1], f: "Tiap piksel diganti rata-rata piksel di sekitarnya (box blur)", nb: true},
+      sharpen: {n: "Sharpen (Tajam)", s: ["Kekuatan k", 0, 3, 1.5, 0.05], f: "R' = R + k × (R − rata-rata 3×3 sekitar piksel)", nb: true},
+    };
+
+    let src = null, res = null, matO = null, matR = null, matF = null, palInfo = null;
+    let imageName = "gambar", view = "rgb", sel = {i: 0, j: 0};
+
+    // ---------- Kontrol ----------
+    function params() {
+      return {s: +$("strength").value, r: +$("red").value, g: +$("green").value, b: +$("blue").value};
+    }
+    function labels() {
+      $("sVal").textContent = (+$("strength").value).toFixed(2);
+      [["red", "rVal"], ["green", "gVal"], ["blue", "bVal"]].forEach(([a, b]) => ($(b).textContent = (+$(a).value).toFixed(2)));
+    }
+    function configure() {
+      const m = MODELS[$("model").value];
+      $("sCtl").classList.toggle("hidden", !m.s);
+      ["rCtl", "gCtl", "bCtl"].forEach((id) => $(id).classList.toggle("hidden", $("model").value !== "rgb"));
+      if (m.s) {
+        $("sLabel").textContent = m.s[0];
+        Object.assign($("strength"), {min: m.s[1], max: m.s[2], step: m.s[4], value: m.s[3]});
+      }
+      $("formula").textContent = "Rumus: " + m.f;
+      labels();
+    }
+
+    // ---------- Filter ----------
+    function px(m, [r, g, b], p) {
+      let o;
+      switch (m) {
+        case "brightness": o = [r * p.s, g * p.s, b * p.s]; break;
+        case "contrast": o = [r, g, b].map((x) => (x - 128) * p.s + 128); break;
+        case "grayscale": {const y = gray(r, g, b); o = [y, y, y]; break;}
+        case "sepia": o = [0.393 * r + 0.769 * g + 0.189 * b, 0.349 * r + 0.686 * g + 0.168 * b, 0.272 * r + 0.534 * g + 0.131 * b]; break;
+        case "rgb": o = [r * p.r, g * p.g, b * p.b]; break;
+        case "saturation": {const y = gray(r, g, b); o = [r, g, b].map((x) => y + (x - y) * p.s); break;}
+        case "negative": o = [255 - r, 255 - g, 255 - b]; break;
+        case "threshold": {const v = gray(r, g, b) >= p.s ? 255 : 0; o = [v, v, v]; break;}
+        default: o = [r, g, b];
+      }
+      return o.map(clamp);
+    }
+
+    function blur(img, radius) {
+      const r = Math.max(0, Math.min(10, Math.round(radius))), {width: w, height: h, data: s} = img;
+      const out = new ImageData(new Uint8ClampedArray(s), w, h);
+      if (!r) return out;
+      const t = new Float32Array(s.length), d = out.data;
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+        let a = 0, b = 0, c = 0, n = 0;
+        for (let xx = Math.max(0, x - r); xx <= Math.min(w - 1, x + r); xx++) {const k = (y * w + xx) * 4; a += s[k]; b += s[k + 1]; c += s[k + 2]; n++;}
+        const p = (y * w + x) * 4; t[p] = a / n; t[p + 1] = b / n; t[p + 2] = c / n;
+      }
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+        let a = 0, b = 0, c = 0, n = 0;
+        for (let yy = Math.max(0, y - r); yy <= Math.min(h - 1, y + r); yy++) {const k = (yy * w + x) * 4; a += t[k]; b += t[k + 1]; c += t[k + 2]; n++;}
+        const p = (y * w + x) * 4; d[p] = clamp(a / n); d[p + 1] = clamp(b / n); d[p + 2] = clamp(c / n);
+      }
+      return out;
+    }
+
+    function sharpen(img, amt) {
+      const {width: w, height: h, data: s} = img, out = new ImageData(new Uint8ClampedArray(s), w, h), d = out.data;
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+        const p = (y * w + x) * 4;
+        for (let c = 0; c < 3; c++) {
+          let sum = 0, n = 0;
+          for (let yy = Math.max(0, y - 1); yy <= Math.min(h - 1, y + 1); yy++)
+            for (let xx = Math.max(0, x - 1); xx <= Math.min(w - 1, x + 1); xx++) {sum += s[(yy * w + xx) * 4 + c]; n++;}
+          d[p + c] = clamp(s[p + c] + (s[p + c] - sum / n) * amt);
+        }
+      }
+      return out;
+    }
+
+    function filterImage(img, m, p) {
+      if (m === "blur") return blur(img, p.s);
+      if (m === "sharpen") return sharpen(img, p.s);
+      const out = new ImageData(new Uint8ClampedArray(img.data), img.width, img.height), d = out.data;
+      for (let i = 0; i < d.length; i += 4) {const o = px(m, [d[i], d[i + 1], d[i + 2]], p); d[i] = o[0]; d[i + 1] = o[1]; d[i + 2] = o[2];}
+      return out;
+    }
+
+    // ---------- Matriks ----------
+    function shrink(img, maxSide) {
+      const k = Math.min(1, maxSide / Math.max(img.width, img.height));
+      const w = Math.max(1, Math.round(img.width * k)), h = Math.max(1, Math.round(img.height * k));
+      const a = document.createElement("canvas"); a.width = img.width; a.height = img.height; a.getContext("2d").putImageData(img, 0, 0);
+      const b = document.createElement("canvas"); b.width = w; b.height = h;
+      const c = b.getContext("2d", {willReadFrequently: true}); c.imageSmoothingQuality = "high"; c.drawImage(a, 0, 0, w, h);
+      return c.getImageData(0, 0, w, h);
+    }
+    function toMat(img) {
+      const M = [];
+      for (let y = 0; y < img.height; y++) {
+        const row = [];
+        for (let x = 0; x < img.width; x++) {const k = (y * img.width + x) * 4; row.push([img.data[k], img.data[k + 1], img.data[k + 2]]);}
+        M.push(row);
+      }
+      return M;
+    }
+    function channel(M, v) {
+      if (v === "rgb") return M;
+      return M.map((row) => row.map((p) => (v === "gray" ? clamp(gray(...p)) : p[NAMES.indexOf(v)])));
+    }
+    function buildMatrices() {
+      const size = +$("matrixSize").value, m = $("model").value, p = params();
+      matO = toMat(shrink(src, size));
+      matR = MODELS[m].nb ? toMat(shrink(res, size)) : matO.map((row) => row.map((pv) => px(m, pv, p)));
+      matF = matR; palInfo = null;
+      const k = +$("palette").value;
+      if (k) {palInfo = quantize(matF, k); matR = palInfo.mat;}
+      sel.i = Math.min(sel.i, matR.length - 1); sel.j = Math.min(sel.j, matR[0].length - 1);
+      $("cMat").textContent = `Matriks: ${matR.length} baris × ${matR[0].length} kolom`;
+      $("cPix").textContent = `Jumlah piksel matriks: ${matR.length * matR[0].length}`;
+    }
+    // Kuantisasi palet: k-means pada warna-warna matriks (inisialisasi titik terjauh, tanpa acak)
+    function quantize(M, k) {
+      const P = M.flat(), d2 = (a, b) => (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2;
+      const uniq = new Set(P.map((p) => p.join(","))).size;
+      k = Math.min(k, uniq);
+      let C = [P[0].slice()];
+      while (C.length < k) {
+        let best = null, bd = -1;
+        P.forEach((p) => {const m = Math.min(...C.map((c) => d2(p, c))); if (m > bd) {bd = m; best = p;} });
+        C.push(best.slice());
+      }
+      const nearest = (p) => {let bi = 0, bd = Infinity; C.forEach((c, i) => {const d = d2(p, c); if (d < bd) {bd = d; bi = i;} }); return bi;};
+      for (let it = 0; it < 10; it++) {
+        const S = C.map(() => [0, 0, 0, 0]);
+        P.forEach((p) => {const s = S[nearest(p)]; s[0] += p[0]; s[1] += p[1]; s[2] += p[2]; s[3]++;});
+        C = C.map((c, i) => (S[i][3] ? [S[i][0] / S[i][3], S[i][1] / S[i][3], S[i][2] / S[i][3]] : c));
+      }
+      C = C.map((c) => c.map(clamp));
+      const cnt = C.map(() => 0);
+      const mat = M.map((row) => row.map((p) => {const i = nearest(p); cnt[i]++; return C[i].slice();}));
+      const pal = C.map((c, i) => ({c, n: cnt[i]})).filter((x) => x.n).sort((a, b) => b.n - a.n);
+      return {mat, pal, k};
+    }
+    function renderPalette() {
+      const total = matR.length * matR[0].length;
+      let pal;
+      if (palInfo) pal = palInfo.pal;
+      else {
+        const m = new Map(); matR.flat().forEach((p) => {const key = p.join(","); m.set(key, (m.get(key) || 0) + 1);});
+        pal = [...m].map(([key, n]) => ({c: key.split(",").map(Number), n})).sort((a, b) => b.n - a.n);
+      }
+      const shownPal = pal.slice(0, 64);
+      $("palBox").innerHTML = `<span class="hint" style="width:100%">${pal.length} warna berbeda dari ${total} sel${pal.length > 64 ? " (64 teratas ditampilkan)" : ""}</span>` +
+        shownPal.map(({c, n}) => `<span class="item"><span class="sw" style="background:rgb(${c})"></span>[${c.join(", ")}] ${n}×</span>`).join("");
+    }
+    const current = () => ($("matSource").value === "orig" ? matO : matR);
+
+    function cellStyle(v, val) {
+      const bg = v === "rgb" ? val : v === "R" ? [val, 0, 0] : v === "G" ? [0, val, 0] : v === "B" ? [0, 0, val] : [val, val, val];
+      return [`rgb(${bg})`, gray(...bg) > 140 ? "#111" : "#fff"];
+    }
+    function renderTable() {
+      const M = current(), C = channel(M, view), t = $("matTable");
+      t.replaceChildren();
+      const hr = t.createTHead().insertRow(); hr.insertCell().outerHTML = "<th>i \\ j</th>";
+      M[0].forEach((_, j) => hr.insertCell().outerHTML = `<th>${j}</th>`);
+      const tb = t.createTBody();
+      C.forEach((row, i) => {
+        const tr = tb.insertRow(); tr.insertCell().outerHTML = `<th>${i}</th>`;
+        row.forEach((val, j) => {
+          const td = tr.insertCell(), [bg, fg] = cellStyle(view, val);
+          td.textContent = view === "rgb" ? `(${val.join(",")})` : val;
+          td.style.background = bg; td.style.color = fg; td.dataset.i = i; td.dataset.j = j;
+          if (i === sel.i && j === sel.j) td.className = "sel";
+        });
+      });
+    }
+    function bracketText(M, v) {
+      const C = channel(M, v), n = C.length;
+      const cell = (x) => (v === "rgb" ? `(${x.join(",")})`.padEnd(13) : String(x).padStart(4));
+      return C.map((row, i) => {
+        const [l, r] = n === 1 ? ["[", "]"] : i === 0 ? ["⎡", "⎤"] : i === n - 1 ? ["⎣", "⎦"] : ["⎢", "⎥"];
+        return `${l} ${row.map(cell).join(" ")} ${r}`;
+      }).join("\n");
+    }
+    function renderMatrix() {
+      if (!matR) return;
+      const br = $("matMode").value === "br";
+      $("heatWrap").classList.toggle("hidden", br);
+      $("brBox").classList.toggle("hidden", !br);
+      if (br) $("brBox").textContent = `M (${current().length} × ${current()[0].length}), tampilan: ${view}\n\n` + bracketText(current(), view);
+      else renderTable();
+    }
+
+    // ---------- Perhitungan satu piksel ----------
+    function explain(m, [r, g, b], p) {
+      const L = [], v = [r, g, b], y = gray(r, g, b);
+      const ln = (n, e, x) => {const c = clamp(x); L.push(`${n}' = ${e} = ${x.toFixed(2)}` + (c !== Math.round(x) ? ` → dibatasi ke ${c}` : ` → ${c}`));};
+      switch (m) {
+        case "brightness": v.forEach((x, i) => ln(NAMES[i], `${x} × ${p.s}`, x * p.s)); break;
+        case "contrast": v.forEach((x, i) => ln(NAMES[i], `(${x} − 128) × ${p.s} + 128`, (x - 128) * p.s + 128)); break;
+        case "grayscale": L.push(`Gray = 0.299×${r} + 0.587×${g} + 0.114×${b} = ${y.toFixed(2)} → ${clamp(y)}`, "R' = G' = B' = Gray"); break;
+        case "sepia": [[0.393, 0.769, 0.189], [0.349, 0.686, 0.168], [0.272, 0.534, 0.131]].forEach((c, i) => ln(NAMES[i], `${c[0]}×${r} + ${c[1]}×${g} + ${c[2]}×${b}`, c[0] * r + c[1] * g + c[2] * b)); break;
+        case "rgb": [p.r, p.g, p.b].forEach((k, i) => ln(NAMES[i], `${v[i]} × ${k}`, v[i] * k)); break;
+        case "saturation": L.push(`Gray = 0.299×${r} + 0.587×${g} + 0.114×${b} = ${y.toFixed(2)}`); v.forEach((x, i) => ln(NAMES[i], `${y.toFixed(2)} + (${x} − ${y.toFixed(2)}) × ${p.s}`, y + (x - y) * p.s)); break;
+        case "negative": v.forEach((x, i) => ln(NAMES[i], `255 − ${x}`, 255 - x)); break;
+        case "threshold": L.push(`Gray = ${y.toFixed(2)}, ambang T = ${p.s}`, `Gray ${y >= p.s ? "≥" : "<"} T, maka semua kanal = ${y >= p.s ? 255 : 0}`); break;
+        case "blur": case "sharpen": L.push("Filter ketetanggaan: nilai piksel dihitung dari piksel di sekitarnya, jadi tidak ada rumus untuk satu piksel saja.", "Nilai hasil diambil dari gambar hasil yang diperkecil."); break;
+        default: L.push("Nilai tidak diubah: R' = R, G' = G, B' = B.");
+      }
+      return L;
+    }
+    function renderCalc() {
+      if (!matR) return;
+      const {i, j} = sel, a = matO[i][j], o = matR[i][j], m = $("model").value;
+      $("selI").max = matR.length - 1; $("selJ").max = matR[0].length - 1; $("selI").value = i; $("selJ").value = j;
+      const box = (t, c) => `<div class="box"><h3>${t}</h3><span class="sw" style="background:rgb(${c})"></span><span class="big">[${c.join(", ")}]</span></div>`;
+      const steps = explain(m, a, params());
+      if (palInfo) steps.push(`Kuantisasi ke ${palInfo.pal.length} warna palet: [${matF[i][j].join(", ")}] → warna palet terdekat [${o.join(", ")}]`);
+      $("calc").innerHTML = box(`Masukan M[${i}][${j}] (asli)`, a) +
+        `<div class="box"><h3>Langkah perhitungan</h3><ol class="steps">${steps.map((s) => `<li>${s}</li>`).join("")}</ol></div>` +
+        box("Keluaran (hasil)", o);
+    }
+
+    // ---------- Statistik & histogram ----------
+    function stats(img) {
+      const d = img.data, sum = [0, 0, 0], h = [0, 1, 2].map(() => new Uint32Array(256));
+      let mn = 255, mx = 0, n = d.length / 4;   
+      for (let i = 0; i < d.length; i += 4) for (let c = 0; c < 3; c++) {const v = d[i + c]; sum[c] += v; h[c][v]++; if (v < mn) mn = v; if (v > mx) mx = v;}
+      const mean = sum.map((s) => s / n);
+      return {mean, lum: gray(...mean), mn, mx, h};
+    }
+    function drawHist(cv, h) {
+      const c = cv.getContext("2d"), W = cv.width, H = cv.height, mx = Math.max(...h.map((a) => Math.max(...a))) || 1;
+      c.clearRect(0, 0, W, H);
+      ["#c2362f", "#2f8f46", "#2d5fd0"].forEach((col, k) => {
+        c.beginPath(); c.strokeStyle = col; c.lineWidth = 1.5;
+        for (let x = 0; x < 256; x++) {const px_ = (x / 255) * W, py = H - (h[k][x] / mx) * (H - 6); x ? c.lineTo(px_, py) : c.moveTo(px_, py);}
+        c.stroke();
+      });
+    }
+    function renderStats(shown) {
+      const a = stats(src), b = stats(shown), f = (x) => x.toFixed(1), df = (x, y) => (y - x >= 0 ? "+" : "") + (y - x).toFixed(1);
+      const sw = (m) => `<span class="sw" style="background:rgb(${m.map(Math.round)})"></span>`;
+      const rows = [["Rata-rata R", a.mean[0], b.mean[0]], ["Rata-rata G", a.mean[1], b.mean[1]], ["Rata-rata B", a.mean[2], b.mean[2]], ["Kecerahan rata-rata", a.lum, b.lum], ["Nilai terendah", a.mn, b.mn], ["Nilai tertinggi", a.mx, b.mx]];
+      $("statBody").innerHTML = rows.map(([n, x, y]) => `<tr><td>${n}</td><td>${f(x)}</td><td>${f(y)}</td><td>${df(x, y)}</td></tr>`).join("") +
+        `<tr><td>Warna rata-rata</td><td>${sw(a.mean)}${a.mean.map(Math.round).join(", ")}</td><td>${sw(b.mean)}${b.mean.map(Math.round).join(", ")}</td><td></td></tr>`;
+      drawHist($("hOrig"), a.h); drawHist($("hRes"), b.h);
+    }
+
+    // ---------- Alur utama ----------
+    // Gambar yang dibangun hanya dari warna-warna di matriks hasil (tiap sel = satu blok warna)
+    function mosaicImage() {
+      const W = res.width, H = res.height, rows = matR.length, cols = matR[0].length, out = new ImageData(W, H), d = out.data;
+      for (let y = 0; y < H; y++) {
+        const i = Math.min(rows - 1, Math.floor((y * rows) / H));
+        for (let x = 0; x < W; x++) {
+          const p = matR[i][Math.min(cols - 1, Math.floor((x * cols) / W))], k = (y * W + x) * 4;
+          d[k] = p[0]; d[k + 1] = p[1]; d[k + 2] = p[2]; d[k + 3] = 255;
+        }
+      }
+      return out;
+    }
+    function apply() {
+      if (!src) return;
+      res = filterImage(src, $("model").value, params());
+      buildMatrices();
+      const shown = $("mosaic").value === "mat" ? mosaicImage() : res;
+      $("resCanvas").width = shown.width; $("resCanvas").height = shown.height;
+      $("resCanvas").getContext("2d").putImageData(shown, 0, 0);
+      renderStats(shown); renderPalette(); renderMatrix(); renderCalc();
+    }
+    function loadFile(file) {
+      if (!file || !file.type.startsWith("image/")) return alert("Pilih file gambar (PNG, JPG, atau WEBP).");
+      imageName = file.name;
+      const url = URL.createObjectURL(file), img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const k = Math.min(1, MAX_WORK / Math.max(img.naturalWidth, img.naturalHeight));
+        const w = Math.max(1, Math.round(img.naturalWidth * k)), h = Math.max(1, Math.round(img.naturalHeight * k));
+        const cv = $("origCanvas"); cv.width = w; cv.height = h;
+        const c = cv.getContext("2d", {willReadFrequently: true}); c.drawImage(img, 0, 0, w, h);
+        src = c.getImageData(0, 0, w, h); sel = {i: 0, j: 0};
+        $("cFile").textContent = `File: ${imageName}`; $("cImg").textContent = `Gambar: ${w} × ${h} piksel`;
+        ["eCsv", "eChan", "eTxt", "eJs", "eJson", "eNpy", "ePng", "eCopy"].forEach((id) => ($(id).disabled = false));
+        apply();
+      };
+      img.onerror = () => {URL.revokeObjectURL(url); alert("Gambar gagal dibuka.");};
+      img.src = url;
+    }
+
+    // ---------- Ekspor ----------
+    function save(blob, name) {
+      const u = URL.createObjectURL(blob), a = document.createElement("a");
+      a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 1000);
+    }
+    const base = () => imageName.replace(/\.[^.]+$/, "").replace(/[^a-z0-9_-]/gi, "_") + "_" + $("model").value;
+    const mname = () => MODELS[$("model").value].n;
+    const csvq = (v) => (/[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v));
+    const txt = (t, type, name) => save(new Blob([t], {type: type + ";charset=utf-8"}), name);
+
+    const EXPORT = {
+      eCsv() {
+        const rows = [["i\\j", ...matR[0].map((_, j) => j)], ...matR.map((r, i) => [i, ...r.map((p) => p.join(" "))])];
+        txt("\uFEFF" + rows.map((r) => r.map(csvq).join(",")).join("\r\n"), "text/csv", base() + "_RGB.csv");
+      },
+      eChan() {
+        NAMES.forEach((n, c) => setTimeout(() => txt(matR.map((r) => r.map((p) => p[c]).join(",")).join("\r\n"), "text/csv", `${base()}_${n}.csv`), c * 300));
+      },
+      eTxt() {
+        txt([`Matriks RGB hasil pengolahan`, `Sumber: ${imageName}`, `Model: ${mname()}`, `Ukuran: ${matR.length} baris x ${matR[0].length} kolom`, ``, bracketText(matR, "rgb")].join("\n"), "text/plain", base() + "_matriks.txt");
+      },
+      eJs() {
+        const body = matR.map((r) => "  [" + r.map((p) => `[${p.join(", ")}]`).join(", ") + "]").join(",\n");
+        txt(`// Sumber: ${imageName} | Model: ${mname()} | ${matR.length} x ${matR[0].length}\nconst matriksRGB = [\n${body}\n];\n\n// matriksRGB[baris][kolom] -> [R, G, B]\nconsole.log(matriksRGB[0][0]);\n\nif (typeof module !== "undefined") module.exports = matriksRGB;\n`, "text/javascript", base() + "_matriks.js");
+      },
+      eJson() {
+        txt(JSON.stringify({sumber: imageName, model: mname(), baris: matR.length, kolom: matR[0].length, matriks: matR}), "application/json", base() + "_matriks.json");
+      },
+      eNpy() {
+        const h = matR.length, w = matR[0].length;
+        let hd = `{'descr': '|u1', 'fortran_order': False, 'shape': (${h}, ${w}, 3), }`;
+        hd += " ".repeat((16 - ((10 + hd.length + 1) % 16)) % 16) + "\n";
+        const hb = new TextEncoder().encode(hd), out = new Uint8Array(10 + hb.length + h * w * 3);
+        out.set([0x93, 0x4e, 0x55, 0x4d, 0x50, 0x59, 1, 0], 0); out[8] = hb.length & 255; out[9] = hb.length >> 8; out.set(hb, 10);
+        let o = 10 + hb.length; matR.forEach((r) => r.forEach((p) => p.forEach((v) => (out[o++] = v))));
+        save(new Blob([out]), base() + "_matriks.npy");
+      },
+      ePng() {$("resCanvas").toBlob((b) => b && save(b, base() + "_hasil.png"));},
+      eCopy() {
+        navigator.clipboard.writeText(bracketText(matR, "rgb")).then(() => {const b = $("eCopy"); b.textContent = "Tersalin"; setTimeout(() => (b.textContent = "Salin matriks"), 1500);}, () => alert("Salin gagal. Gunakan ekspor TXT."));
+      },
+    };
+
+    // ---------- Event ----------
+    $("model").innerHTML = Object.entries(MODELS).map(([k, m]) => `<option value="${k}">${m.n}</option>`).join("");
+    $("fileInput").addEventListener("change", (e) => loadFile(e.target.files[0]));
+    $("model").addEventListener("change", () => {configure(); apply();});
+    $("matrixSize").addEventListener("change", apply);
+    $("mosaic").addEventListener("change", apply);
+    $("palette").addEventListener("change", apply);
+    ["strength", "red", "green", "blue"].forEach((id) => $(id).addEventListener("input", () => {labels(); apply();}));
+    $("resetBtn").addEventListener("click", () => {["red", "green", "blue"].forEach((id) => ($(id).value = 1)); configure(); apply();});
+    $("matSource").addEventListener("change", renderMatrix);
+    $("matMode").addEventListener("change", renderMatrix);
+    $("tabs").addEventListener("click", (e) => {
+      const b = e.target.closest("button"); if (!b) return;
+      view = b.dataset.v;[...$("tabs").children].forEach((x) => x.classList.toggle("on", x === b)); renderMatrix();
+    });
+    $("matTable").addEventListener("click", (e) => {
+      const td = e.target.closest("td[data-i]"); if (!td) return;
+      sel = {i: +td.dataset.i, j: +td.dataset.j}; renderMatrix(); renderCalc();
+    });
+    ["selI", "selJ"].forEach((id) => $(id).addEventListener("change", () => {
+      if (!matR) return;
+      sel = {i: Math.max(0, Math.min(matR.length - 1, +$("selI").value || 0)), j: Math.max(0, Math.min(matR[0].length - 1, +$("selJ").value || 0))};
+      renderMatrix(); renderCalc();
+    }));
+    Object.keys(EXPORT).forEach((id) => $(id).addEventListener("click", () => matR && EXPORT[id]()));
+    const dz = $("dropZone");
+    dz.addEventListener("dragover", (e) => e.preventDefault());
+    dz.addEventListener("drop", (e) => {e.preventDefault(); loadFile(e.dataTransfer.files[0]);});
+
+    // ---------- Tema terang / gelap ----------
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    function applyTheme() {
+      const mode = $("theme").value;
+      document.documentElement.dataset.theme = mode === "auto" ? (mq.matches ? "dark" : "light") : mode;
+    }
+    let savedTheme = "light";
+    try {savedTheme = localStorage.getItem("rgbTheme") || "light";} catch (e) { }
+    $("theme").value = ["light", "dark", "auto"].includes(savedTheme) ? savedTheme : "light";
+    applyTheme();
+    $("theme").addEventListener("change", () => {
+      try {localStorage.setItem("rgbTheme", $("theme").value);} catch (e) { }
+      applyTheme();
+    });
+    mq.addEventListener("change", applyTheme);
+
+    configure();
+
+  </script>
+</body>
+
+</html>
